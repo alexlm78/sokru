@@ -12,7 +12,7 @@ var rootCmd = &cobra.Command{
 	Long:  `Sok is a cli tool for managing dotfiles on localhost. It allows you to configure and manage your dotfiles easily.`,
 	Args:  valArguments,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Hello from Sok!")
+		fmt.Println("Sok (formerly Sokru) is a cli tool for managing dotfiles on localhost")
 	},
 }
 
@@ -26,16 +26,16 @@ func Execute() {
 }
 
 func init() {
-	var Verbose bool
-	var Request string
-	var Headers []string
-	var Data string
+	//var Verbose bool
+	//var Request string
+	//var Headers []string
+	//var Data string
 
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	rootCmd.Flags().StringArrayVarP(&Headers, "header", "H", []string{}, "Pass custom headers to the server.")
-	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Prints the details of the response such as protocol, status, and headers.")
-	rootCmd.PersistentFlags().StringVarP(&Request, "request", "X", "GET", "Specifies the request command to use.")
-	rootCmd.PersistentFlags().StringVarP(&Data, "data", "d", "", "Sends the specified data in a POST request to the HTTP server.")
+	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	//rootCmd.Flags().StringArrayVarP(&Headers, "header", "H", []string{}, "Pass custom headers to the server.")
+	//rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Prints the details of the response such as protocol, status, and headers.")
+	//rootCmd.PersistentFlags().StringVarP(&Request, "request", "X", "GET", "Specifies the request command to use.")
+	//rootCmd.PersistentFlags().StringVarP(&Data, "data", "d", "", "Sends the specified data in a POST request to the HTTP server.")
 }
 
 func valArguments(cmd *cobra.Command, args []string) error {
