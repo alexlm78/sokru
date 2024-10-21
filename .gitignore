@@ -186,3 +186,6 @@ $RECYCLE.BIN/
 
 # self binay
 sok
+build/
+temp/
+
