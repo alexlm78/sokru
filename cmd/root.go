@@ -1,3 +1,7 @@
+// Package cmd
+// Description: This file contains the root command for the cli tool. It is the entry point for the cli tool.
+// (c) 2023 Alejandro Lopez Monzon <alejandro@kreaker.dev>
+
 package cmd
 
 import (
@@ -26,14 +30,14 @@ func Execute() {
 }
 
 func init() {
-	//var Verbose bool
+	var Verbose bool
 	//var Request string
 	//var Headers []string
 	//var Data string
 
 	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	//rootCmd.Flags().StringArrayVarP(&Headers, "header", "H", []string{}, "Pass custom headers to the server.")
-	//rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Prints the details of the response such as protocol, status, and headers.")
+	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Prints the details of the response such as protocol, status, and headers.")
 	//rootCmd.PersistentFlags().StringVarP(&Request, "request", "X", "GET", "Specifies the request command to use.")
 	//rootCmd.PersistentFlags().StringVarP(&Data, "data", "d", "", "Sends the specified data in a POST request to the HTTP server.")
 }

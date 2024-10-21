@@ -1,6 +1,7 @@
-/*
-Copyright © 2024 Alejanjdro Lopez Monzon <alejandro@kreaker.dev>
-*/
+// Package cmd
+// Description: This file contains the apply command for the cli tool. It is used to apply the changes in memory and reload the symlinks and dotfiles.
+// (c) 2023 Alejandro Lopez Monzon <alejandro@kreaker.dev>
+
 package cmd
 
 import (

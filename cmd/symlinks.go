@@ -1,6 +1,7 @@
-/*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-*/
+// Package cmd
+// Description: This file contains the symlinks command for the cli tool. It is used to manage the symlinks in the system.
+// (c) 2023 Alejandro Lopez Monzon <alejandro@kreaker.dev>
+
 package cmd
 
 import (
