@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -31,7 +32,20 @@ var initCmd = &cobra.Command{
 	You can change the main start directory with the command sok config set dotdir <path>
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Initiliazing sok")
+		fmt.Println("Initiliazing sok...")
+		homeDir, _ := os.UserHomeDir()
+		sokruDir := homeDir + "/.sokru"
+		sokruFile := sokruDir + "/config.yaml"
+
+		if _, err := os.Stat(sokruDir); os.IsNotExist(err) {
+			os.Mkdir(sokruDir, 0755)
+			os.Create(sokruFile)
+		} else {
+			// check if config.yaml exists if not create it
+			if _, err := os.Stat(sokruFile); os.IsNotExist(err) {
+				os.Create(sokruFile)
+			}
+		}
 	},
 }
 
