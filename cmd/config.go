@@ -5,8 +5,19 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/spf13/cobra"
 )
+
+func init() {
+	configCmd.AddCommand(configDotDirCmd)
+	configCmd.AddCommand(configSymlinkFileCmd)
+	configCmd.AddCommand(configVerboseCmd)
+	configCmd.AddCommand(configDryrunCmd)
+	configCmd.AddCommand(configOsCmd)
+	configCmd.AddCommand(configHelpCmd)
+	rootCmd.AddCommand(configCmd)
+}
 
 // configCmd represents the config command
 var configCmd = &cobra.Command{
@@ -16,23 +27,54 @@ var configCmd = &cobra.Command{
 	Run:   HelpConfigFunc,
 }
 
+var configDotDirCmd = &cobra.Command{
+	Use:   "dotdir",
+	Short: "Set the directory where the dotfiles are located",
+	Long:  `This command will allow you to set the directory where the dotfiles are located.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("dotdir command")
+	},
+}
+
+var configSymlinkFileCmd = &cobra.Command{
+	Use:   "symlinkfile",
+	Short: "Set the file where the symlinks are located",
+	Long:  `This command will allow you to set the file where the symlinks are located.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("symlinkfile command")
+	},
+}
+
+var configVerboseCmd = &cobra.Command{
+	Use:   "verbose",
+	Short: "Set the verbosity of the output",
+	Long:  `This command will allow you to set the verbosity of the output.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("verbose command")
+	},
+}
+
+var configDryrunCmd = &cobra.Command{
+	Use:   "dryrun",
+	Short: "Set the dry run mode",
+	Long:  `This command will allow you to set the dry run mode.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("dryrun command")
+	},
+}
+
+var configOsCmd = &cobra.Command{
+	Use:   "os",
+	Short: "Set the operating system",
+	Long:  `This command will allow you to set the operating system.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("os command")
+	},
+}
+
 var configHelpCmd = &cobra.Command{
 	Use:   "help",
 	Short: "Help for the config",
 	Long:  `This command will show the help for the config command.`,
 	Run:   HelpConfigFunc,
-}
-
-func init() {
-	rootCmd.AddCommand(configCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// configCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// configCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
