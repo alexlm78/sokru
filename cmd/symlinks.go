@@ -42,9 +42,7 @@ var uninstallCmd = &cobra.Command{
 	Use:   "uninstall",
 	Short: "Uninstall the symlinks",
 	Long:  `This command will uninstall the symlinks in the system.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Uninstalling symlinks")
-	},
+	Run:   UninstallSymlinksFunc,
 }
 
 // listCMd represents the list symlink configured (symlinks.yaml)
@@ -145,6 +143,129 @@ func InstallSymlinksFunc(*cobra.Command, []string) {
 				fmt.Printf("Symlink created: %s -> %s\n", targetPath, sourcePath)
 			}
 		}
+	}
+}
+
+func UninstallSymlinksFunc(*cobra.Command, []string) {
+	// Get configuration
+	cfg, err := config.GetConfig()
+	if err != nil {
+		log.Fatalf("Error loading configuration: %v", err)
+	}
+
+	// Expand path if it contains ~
+	symlinkFile := expandPath(cfg.SymlinksFile)
+
+	// Check if symlinks file exists
+	if _, err := os.Stat(symlinkFile); os.IsNotExist(err) {
+		log.Fatalf("Symlinks file not found: %s\nPlease create the file or update the configuration with: sok config symlinkfile <path>", symlinkFile)
+	}
+
+	// Verbose output
+	if cfg.Verbose {
+		fmt.Printf("Reading symlinks configuration from: %s\n", symlinkFile)
+	}
+
+	// Read the YAML file
+	data, err := os.ReadFile(symlinkFile)
+	if err != nil {
+		log.Fatalf("Error reading YAML file: %v", err)
+	}
+
+	// Unmarshal YAML to struct
+	var symlinkConfigs []SymlinkConfig
+	err = yaml.Unmarshal(data, &symlinkConfigs)
+	if err != nil {
+		log.Fatalf("Error parsing YAML: %v", err)
+	}
+
+	if cfg.Verbose {
+		fmt.Printf("Found %d symlink configuration(s)\n", len(symlinkConfigs))
+	}
+
+	// Counters for summary
+	var removed, skipped, notFound, notSymlink int
+
+	// Iterate over items and remove symbolic links
+	for _, entry := range symlinkConfigs {
+		for target, source := range entry.Link {
+			targetPath := expandPath(target)
+			sourcePath := expandPath(source)
+
+			// Check if target exists
+			fileInfo, err := os.Lstat(targetPath)
+			if os.IsNotExist(err) {
+				if cfg.Verbose {
+					fmt.Printf("Symlink not found (already removed): %s\n", targetPath)
+				}
+				notFound++
+				continue
+			}
+			if err != nil {
+				log.Printf("Error checking file at %s: %v", targetPath, err)
+				skipped++
+				continue
+			}
+
+			// Check if it's a symlink
+			if fileInfo.Mode()&os.ModeSymlink == 0 {
+				log.Printf("Warning: %s is not a symlink, skipping (will not remove regular files)", targetPath)
+				notSymlink++
+				continue
+			}
+
+			// Read the symlink to verify it points to the expected source
+			existingLink, err := os.Readlink(targetPath)
+			if err != nil {
+				log.Printf("Error reading symlink at %s: %v", targetPath, err)
+				skipped++
+				continue
+			}
+
+			// Verify the symlink points to the expected source
+			if existingLink != sourcePath {
+				if cfg.Verbose {
+					fmt.Printf("Symlink points to different source: %s -> %s (expected: %s), skipping\n",
+						targetPath, existingLink, sourcePath)
+				}
+				skipped++
+				continue
+			}
+
+			// Check if dry-run mode is enabled
+			if cfg.DryRun {
+				fmt.Printf("[DRY-RUN] Would remove symlink: %s -> %s\n", targetPath, sourcePath)
+				removed++
+				continue
+			}
+
+			// Remove the symlink
+			err = os.Remove(targetPath)
+			if err != nil {
+				log.Printf("Error removing symlink at %s: %v", targetPath, err)
+				skipped++
+			} else {
+				fmt.Printf("Symlink removed: %s -> %s\n", targetPath, sourcePath)
+				removed++
+			}
+		}
+	}
+
+	// Print summary
+	fmt.Println("\n--- Uninstall Summary ---")
+	if cfg.DryRun {
+		fmt.Printf("Would remove: %d symlink(s)\n", removed)
+	} else {
+		fmt.Printf("Removed: %d symlink(s)\n", removed)
+	}
+	if notFound > 0 {
+		fmt.Printf("Not found: %d symlink(s)\n", notFound)
+	}
+	if notSymlink > 0 {
+		fmt.Printf("Not symlinks (skipped): %d file(s)\n", notSymlink)
+	}
+	if skipped > 0 {
+		fmt.Printf("Skipped: %d symlink(s)\n", skipped)
 	}
 }
 
