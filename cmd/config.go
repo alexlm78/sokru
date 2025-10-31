@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/alexlm78/sokru/internal/config"
 	"github.com/spf13/cobra"
@@ -88,15 +89,16 @@ var configDotDirCmd = &cobra.Command{
 			return
 		}
 
-		// Update value
+		// Expand path and update value
+		expandedPath := expandPath(args[0])
 		err = config.UpdateConfig(func(c *config.Config) {
-			c.DotfilesDir = args[0]
+			c.DotfilesDir = expandedPath
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: Failed to update config: %v\n", err)
 			os.Exit(1)
 		}
-		fmt.Printf("Dotfiles directory set to: %s\n", args[0])
+		fmt.Printf("Dotfiles directory set to: %s\n", expandedPath)
 	},
 }
 
@@ -118,15 +120,16 @@ var configSymlinkFileCmd = &cobra.Command{
 			return
 		}
 
-		// Update value
+		// Expand path and update value
+		expandedPath := expandPath(args[0])
 		err = config.UpdateConfig(func(c *config.Config) {
-			c.SymlinksFile = args[0]
+			c.SymlinksFile = expandedPath
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: Failed to update config: %v\n", err)
 			os.Exit(1)
 		}
-		fmt.Printf("Symlinks file set to: %s\n", args[0])
+		fmt.Printf("Symlinks file set to: %s\n", expandedPath)
 	},
 }
 
@@ -220,15 +223,22 @@ var configOsCmd = &cobra.Command{
 			return
 		}
 
+		// Validate OS
+		osName := strings.ToLower(args[0])
+		if !validateOS(osName) {
+			fmt.Fprintf(os.Stderr, "Error: Invalid OS '%s'. Valid options are: linux, darwin, windows\n", args[0])
+			os.Exit(1)
+		}
+
 		// Update value
 		err = config.UpdateConfig(func(c *config.Config) {
-			c.OS = args[0]
+			c.OS = osName
 		})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error: Failed to update config: %v\n", err)
 			os.Exit(1)
 		}
-		fmt.Printf("OS set to: %s\n", args[0])
+		fmt.Printf("OS set to: %s\n", osName)
 	},
 }
 

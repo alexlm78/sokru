@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 
 	"github.com/alexlm78/sokru/internal/config"
 	"github.com/spf13/cobra"
@@ -392,13 +391,4 @@ func init() {
 	symlinksCmd.AddCommand(listCmd)
 	symlinksCmd.AddCommand(symhelpCmd)
 	rootCmd.AddCommand(symlinksCmd)
-}
-
-// expandPath reemplaza ~ con el directorio HOME
-func expandPath(path string) string {
-	if path[:2] == "~/" {
-		homeDir, _ := os.UserHomeDir()
-		return filepath.Join(homeDir, path[2:])
-	}
-	return path
 }
