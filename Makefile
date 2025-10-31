@@ -1,4 +1,4 @@
-all: win
+all: mac
 
 macx86:
 	GOOS=darwin GOARCH=amd64 go build -o sok main.go

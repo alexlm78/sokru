@@ -6,13 +6,13 @@ package cmd
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 
+	"github.com/alexlm78/sokru/internal/config"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 )
 
 type SymlinkConfig struct {
@@ -66,50 +66,83 @@ var symhelpCmd = &cobra.Command{
 }
 
 func InstallSymlinksFunc(*cobra.Command, []string) {
+	// Get configuration
+	cfg, err := config.GetConfig()
+	if err != nil {
+		log.Fatalf("Error loading configuration: %v", err)
+	}
+
+	// Expand path if it contains ~
+	symlinkFile := expandPath(cfg.SymlinksFile)
+
+	// Check if symlinks file exists
+	if _, err := os.Stat(symlinkFile); os.IsNotExist(err) {
+		log.Fatalf("Symlinks file not found: %s\nPlease create the file or update the configuration with: sok config symlinkfile <path>", symlinkFile)
+	}
+
+	// Verbose output
+	if cfg.Verbose {
+		fmt.Printf("Reading symlinks configuration from: %s\n", symlinkFile)
+	}
+
 	// Read the YAML file
-	data, err := ioutil.ReadFile("/Users/alexlm78/.dotfiles/symlinks.yml")
+	data, err := os.ReadFile(symlinkFile)
 	if err != nil {
-		log.Fatalf("Error leyendo el archivo YAML: %v", err)
+		log.Fatalf("Error reading YAML file: %v", err)
 	}
 
-	// Unmarshal del YAML al struct
-	var config []SymlinkConfig
-	err = yaml.Unmarshal(data, &config)
+	// Unmarshal YAML to struct
+	var symlinkConfigs []SymlinkConfig
+	err = yaml.Unmarshal(data, &symlinkConfigs)
 	if err != nil {
-		log.Fatalf("Error parseando el YAML: %v", err)
+		log.Fatalf("Error parsing YAML: %v", err)
 	}
 
-	// Itera sobre los items y crea los enlaces simbólicos
-	for _, entry := range config {
+	if cfg.Verbose {
+		fmt.Printf("Found %d symlink configuration(s)\n", len(symlinkConfigs))
+	}
+
+	// Iterate over items and create symbolic links
+	for _, entry := range symlinkConfigs {
 		for target, source := range entry.Link {
 			targetPath := expandPath(target)
 			sourcePath := expandPath(source)
 
-			existingLink, err := os.Readlink(targetPath)
-			if err == nil {
-				if existingLink == sourcePath {
-					fmt.Printf("El enlace simbólico ya existe y es correcto para %s -> %s\n", targetPath, sourcePath)
-					continue
-				} else {
-					// Eliminar el enlace existente si apunta a un destino diferente
-					err = os.Remove(targetPath)
-					if err != nil {
-						log.Printf("Error eliminando el symlink existente en %s: %v", targetPath, err)
-						continue
-					}
-					fmt.Printf("Enlace simbólico existente eliminado para %s\n", targetPath)
-				}
-			} else if !os.IsNotExist(err) {
-				log.Printf("Error verificando el symlink en %s: %v", targetPath, err)
+			// Check if dry-run mode is enabled
+			if cfg.DryRun {
+				fmt.Printf("[DRY-RUN] Would create symlink: %s -> %s\n", targetPath, sourcePath)
 				continue
 			}
 
-			// Crear el nuevo enlace simbólico
+			existingLink, err := os.Readlink(targetPath)
+			if err == nil {
+				if existingLink == sourcePath {
+					if cfg.Verbose {
+						fmt.Printf("Symlink already exists and is correct: %s -> %s\n", targetPath, sourcePath)
+					}
+					continue
+				} else {
+					// Remove existing link if it points to a different destination
+					err = os.Remove(targetPath)
+					if err != nil {
+						log.Printf("Error removing existing symlink at %s: %v", targetPath, err)
+						continue
+					}
+					if cfg.Verbose {
+						fmt.Printf("Existing symlink removed: %s\n", targetPath)
+					}
+				}
+			} else if !os.IsNotExist(err) {
+				log.Printf("Error checking symlink at %s: %v", targetPath, err)
+				continue
+			}
+
+			// Create the new symbolic link
 			err = os.Symlink(sourcePath, targetPath)
 			if err != nil {
-				log.Printf("Error creando el symlink de %s a %s: %v", targetPath, sourcePath, err)
+				log.Printf("Error creating symlink from %s to %s: %v", targetPath, sourcePath, err)
 			} else {
-				fmt.Printf("Enlace simbólico creado de %s a %s\n", targetPath, sourcePath)
+				fmt.Printf("Symlink created: %s -> %s\n", targetPath, sourcePath)
 			}
 		}
 	}
