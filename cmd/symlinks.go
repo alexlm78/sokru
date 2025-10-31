@@ -49,10 +49,8 @@ var uninstallCmd = &cobra.Command{
 var listCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List the symlinks",
-	Long:  `This command will list the symlinks in the system.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Listing symlinks")
-	},
+	Long:  `This command will list the symlinks and their status in the system.`,
+	Run:   ListSymlinksFunc,
 }
 
 // helpCmd represents the help command
@@ -267,6 +265,125 @@ func UninstallSymlinksFunc(*cobra.Command, []string) {
 	if skipped > 0 {
 		fmt.Printf("Skipped: %d symlink(s)\n", skipped)
 	}
+}
+
+func ListSymlinksFunc(*cobra.Command, []string) {
+	// Get configuration
+	cfg, err := config.GetConfig()
+	if err != nil {
+		log.Fatalf("Error loading configuration: %v", err)
+	}
+
+	// Expand path if it contains ~
+	symlinkFile := expandPath(cfg.SymlinksFile)
+
+	// Check if symlinks file exists
+	if _, err := os.Stat(symlinkFile); os.IsNotExist(err) {
+		log.Fatalf("Symlinks file not found: %s\nPlease create the file or update the configuration with: sok config symlinkfile <path>", symlinkFile)
+	}
+
+	// Verbose output
+	if cfg.Verbose {
+		fmt.Printf("Reading symlinks configuration from: %s\n\n", symlinkFile)
+	}
+
+	// Read the YAML file
+	data, err := os.ReadFile(symlinkFile)
+	if err != nil {
+		log.Fatalf("Error reading YAML file: %v", err)
+	}
+
+	// Unmarshal YAML to struct
+	var symlinkConfigs []SymlinkConfig
+	err = yaml.Unmarshal(data, &symlinkConfigs)
+	if err != nil {
+		log.Fatalf("Error parsing YAML: %v", err)
+	}
+
+	// Print header
+	fmt.Println("Symlinks Status:")
+	fmt.Println("================")
+	fmt.Println()
+	fmt.Printf("%-8s %-40s -> %s\n", "Status", "Target", "Source")
+	fmt.Println(fmt.Sprintf("%s", "─────────────────────────────────────────────────────────────────────────────────────────────"))
+
+	// Counters for summary
+	var installed, wrongTarget, notInstalled, regularFile int
+
+	// Iterate over items and check status
+	for _, entry := range symlinkConfigs {
+		for target, source := range entry.Link {
+			targetPath := expandPath(target)
+			sourcePath := expandPath(source)
+
+			// Check if target exists
+			fileInfo, err := os.Lstat(targetPath)
+
+			if os.IsNotExist(err) {
+				// Not installed
+				fmt.Printf("%-8s %-40s -> %s\n", "❌", targetPath, sourcePath)
+				notInstalled++
+				continue
+			}
+
+			if err != nil {
+				log.Printf("Error checking file at %s: %v", targetPath, err)
+				continue
+			}
+
+			// Check if it's a symlink
+			if fileInfo.Mode()&os.ModeSymlink == 0 {
+				// Regular file exists at target location
+				fmt.Printf("%-8s %-40s -> %s\n", "⛔", targetPath, sourcePath)
+				regularFile++
+				continue
+			}
+
+			// Read the symlink
+			existingLink, err := os.Readlink(targetPath)
+			if err != nil {
+				log.Printf("Error reading symlink at %s: %v", targetPath, err)
+				continue
+			}
+
+			// Check if it points to the correct source
+			if existingLink == sourcePath {
+				// Installed correctly
+				fmt.Printf("%-8s %-40s -> %s\n", "✅", targetPath, sourcePath)
+				installed++
+			} else {
+				// Installed but wrong target
+				fmt.Printf("%-8s %-40s -> %s\n", "⚠️", targetPath, sourcePath)
+				if cfg.Verbose {
+					fmt.Printf("         (currently points to: %s)\n", existingLink)
+				}
+				wrongTarget++
+			}
+		}
+	}
+
+	// Print summary
+	fmt.Println()
+	fmt.Println("Summary:")
+	fmt.Println("--------")
+	fmt.Printf("✅ Installed correctly:    %d\n", installed)
+	if wrongTarget > 0 {
+		fmt.Printf("⚠️  Wrong target:          %d\n", wrongTarget)
+	}
+	if notInstalled > 0 {
+		fmt.Printf("❌ Not installed:         %d\n", notInstalled)
+	}
+	if regularFile > 0 {
+		fmt.Printf("⛔ Regular file exists:   %d\n", regularFile)
+	}
+	fmt.Printf("\nTotal symlinks configured: %d\n", installed+wrongTarget+notInstalled+regularFile)
+
+	// Show legend
+	fmt.Println("\nLegend:")
+	fmt.Println("  ✅ = Symlink installed and points to correct source")
+	fmt.Println("  ⚠️  = Symlink exists but points to different source")
+	fmt.Println("  ❌ = Symlink not installed")
+	fmt.Println("  ⛔ = Regular file exists at target location (not a symlink)")
 }
 
 func init() {
