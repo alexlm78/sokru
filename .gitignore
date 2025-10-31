@@ -186,6 +186,19 @@ $RECYCLE.BIN/
 
 # self binay
 sok
+sokru
 build/
 temp/
 
+
+# Local application settings (Java, .NET, etc.)
+application-*.{properties,yaml,yml}
+appsettings.*.json
+
+# Kreaker specific files
+CLAUDE.md
+WARP.md
+.claude
+.kiro
+.trae
+doxs/

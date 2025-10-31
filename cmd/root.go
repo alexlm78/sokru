@@ -6,8 +6,10 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
+
+	"github.com/alexlm78/sokru/internal/config"
+	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
@@ -30,16 +32,17 @@ func Execute() {
 }
 
 func init() {
-	var Verbose bool
-	//var Request string
-	//var Headers []string
-	//var Data string
+	// Load configuration
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: Failed to load config: %v\n", err)
+		cfg = config.GetDefaultConfig()
+	}
+	config.SetConfig(cfg)
 
-	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	//rootCmd.Flags().StringArrayVarP(&Headers, "header", "H", []string{}, "Pass custom headers to the server.")
-	rootCmd.PersistentFlags().BoolVarP(&Verbose, "verbose", "v", false, "Prints the details of the response such as protocol, status, and headers.")
-	//rootCmd.PersistentFlags().StringVarP(&Request, "request", "X", "GET", "Specifies the request command to use.")
-	//rootCmd.PersistentFlags().StringVarP(&Data, "data", "d", "", "Sends the specified data in a POST request to the HTTP server.")
+	// Set up persistent flags
+	rootCmd.PersistentFlags().BoolVarP(&cfg.Verbose, "verbose", "v", cfg.Verbose, "Prints the details of the response such as protocol, status, and headers.")
+	rootCmd.PersistentFlags().BoolVar(&cfg.DryRun, "dry-run", cfg.DryRun, "Run in dry-run mode without making actual changes.")
 }
 
 func valArguments(cmd *cobra.Command, args []string) error {
