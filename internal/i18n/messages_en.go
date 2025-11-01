@@ -55,15 +55,40 @@ const (
 	MsgFilteringByOS          MessageKey = "filtering_by_os"
 	MsgUsingCommonLinks       MessageKey = "using_common_links"
 	MsgUsingOSSpecificLinks   MessageKey = "using_os_specific_links"
-	
+
 	// Rollback messages
-	MsgRollbackStarting       MessageKey = "rollback_starting"
-	MsgRollbackComplete       MessageKey = "rollback_complete"
-	MsgRollbackFailed         MessageKey = "rollback_failed"
-	MsgRollbackAction         MessageKey = "rollback_action"
-	MsgRollbackRemoved        MessageKey = "rollback_removed"
-	MsgRollbackRestored       MessageKey = "rollback_restored"
-	MsgRollbackRecreated      MessageKey = "rollback_recreated"
+	MsgRollbackStarting  MessageKey = "rollback_starting"
+	MsgRollbackComplete  MessageKey = "rollback_complete"
+	MsgRollbackFailed    MessageKey = "rollback_failed"
+	MsgRollbackAction    MessageKey = "rollback_action"
+	MsgRollbackRemoved   MessageKey = "rollback_removed"
+	MsgRollbackRestored  MessageKey = "rollback_restored"
+	MsgRollbackRecreated MessageKey = "rollback_recreated"
+
+	// Backup/Restore messages
+	MsgErrorGettingBackupDir MessageKey = "error_getting_backup_dir"
+	MsgErrorListingBackups   MessageKey = "error_listing_backups"
+	MsgErrorLoadingBackup    MessageKey = "error_loading_backup"
+	MsgErrorDeletingBackup   MessageKey = "error_deleting_backup"
+	MsgNoBackupsFound        MessageKey = "no_backups_found"
+	MsgAvailableBackups      MessageKey = "available_backups"
+	MsgTimestamp             MessageKey = "timestamp"
+	MsgCommand               MessageKey = "command"
+	MsgFiles                 MessageKey = "files"
+	MsgTotalBackups          MessageKey = "total_backups"
+	MsgRestoringBackup       MessageKey = "restoring_backup"
+	MsgBackupCreated         MessageKey = "backup_created"
+	MsgFilesToRestore        MessageKey = "files_to_restore"
+	MsgFilesInBackup         MessageKey = "files_in_backup"
+	MsgRestoringFiles        MessageKey = "restoring_files"
+	MsgRestoreFailed         MessageKey = "restore_failed"
+	MsgRestoreComplete       MessageKey = "restore_complete"
+	MsgDeletingBackup        MessageKey = "deleting_backup"
+	MsgBackupDeleted         MessageKey = "backup_deleted"
+	MsgBackupInProgress      MessageKey = "backup_in_progress"
+	MsgBackupComplete        MessageKey = "backup_complete"
+	MsgBackupFailed          MessageKey = "backup_failed"
+	MsgBackingUpFile         MessageKey = "backing_up_file"
 
 	// Apply messages
 	MsgApplyingChanges    MessageKey = "applying_changes"
@@ -176,15 +201,40 @@ func getEnglishMessages() map[MessageKey]string {
 		MsgFilteringByOS:          "Filtering symlinks for OS: %s",
 		MsgUsingCommonLinks:       "Using common links (all OS)",
 		MsgUsingOSSpecificLinks:   "Using OS-specific links for: %s",
-		
+
 		// Rollback messages
-		MsgRollbackStarting:       "Error occurred, starting rollback of %d action(s)...",
-		MsgRollbackComplete:       "Rollback completed successfully",
-		MsgRollbackFailed:         "Rollback completed with errors: %v",
-		MsgRollbackAction:         "Rolling back action %d/%d",
-		MsgRollbackRemoved:        "Removed created symlink: %s",
-		MsgRollbackRestored:       "Restored previous symlink: %s -> %s",
-		MsgRollbackRecreated:      "Recreated removed symlink: %s -> %s",
+		MsgRollbackStarting:  "Error occurred, starting rollback of %d action(s)...",
+		MsgRollbackComplete:  "Rollback completed successfully",
+		MsgRollbackFailed:    "Rollback completed with errors: %v",
+		MsgRollbackAction:    "Rolling back action %d/%d",
+		MsgRollbackRemoved:   "Removed created symlink: %s",
+		MsgRollbackRestored:  "Restored previous symlink: %s -> %s",
+		MsgRollbackRecreated: "Recreated removed symlink: %s -> %s",
+
+		// Backup/Restore messages
+		MsgErrorGettingBackupDir: "Error getting backup directory: %v",
+		MsgErrorListingBackups:   "Error listing backups: %v",
+		MsgErrorLoadingBackup:    "Error loading backup '%s': %v",
+		MsgErrorDeletingBackup:   "Error deleting backup: %v",
+		MsgNoBackupsFound:        "No backups found",
+		MsgAvailableBackups:      "Available Backups",
+		MsgTimestamp:             "Timestamp",
+		MsgCommand:               "Command",
+		MsgFiles:                 "Files",
+		MsgTotalBackups:          "Total backups",
+		MsgRestoringBackup:       "Restoring backup",
+		MsgBackupCreated:         "Backup created",
+		MsgFilesToRestore:        "Files to restore",
+		MsgFilesInBackup:         "Files in backup:",
+		MsgRestoringFiles:        "Restoring files...",
+		MsgRestoreFailed:         "Restore failed: %v",
+		MsgRestoreComplete:       "Restore completed successfully",
+		MsgDeletingBackup:        "Deleting backup",
+		MsgBackupDeleted:         "Backup deleted: %s",
+		MsgBackupInProgress:      "Creating backup...",
+		MsgBackupComplete:        "Backup completed: %s",
+		MsgBackupFailed:          "Backup failed: %v",
+		MsgBackingUpFile:         "Backing up: %s",
 
 		// Apply messages
 		MsgApplyingChanges:    "Applying configuration changes...",

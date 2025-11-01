@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
+	"github.com/alexlm78/sokru/internal/backup"
 	"github.com/alexlm78/sokru/internal/config"
 	"github.com/alexlm78/sokru/internal/i18n"
 	"github.com/alexlm78/sokru/internal/rollback"
@@ -151,6 +153,21 @@ func InstallSymlinksFunc(*cobra.Command, []string) {
 		fmt.Println(i18n.Info(i18n.MsgFoundConfigurations, len(symlinkConfigs)))
 	}
 
+	// Create backup manager and metadata
+	backupDir, err := backup.GetDefaultBackupDir()
+	if err != nil {
+		log.Fatalf("%s", i18n.Error(i18n.MsgErrorGettingBackupDir, err))
+	}
+
+	backupMgr := backup.NewManager(backupDir)
+	backupID := backup.GenerateBackupID()
+	backupMetadata := &backup.BackupMetadata{
+		ID:        backupID,
+		Timestamp: time.Now(),
+		Command:   "symlinks install",
+		Entries:   []backup.BackupEntry{},
+	}
+
 	// Create rollback tracker
 	tracker := rollback.NewTracker()
 	var hasError bool
@@ -168,6 +185,21 @@ func InstallSymlinksFunc(*cobra.Command, []string) {
 			if cfg.DryRun {
 				fmt.Println(i18n.Info(i18n.MsgDryRunWouldCreate, targetPath, sourcePath))
 				continue
+			}
+
+			// Check if file/symlink exists and create backup
+			if _, err := os.Lstat(targetPath); err == nil {
+				if cfg.Verbose {
+					fmt.Println(i18n.Info(i18n.MsgBackingUpFile, targetPath))
+				}
+
+				backupEntry, err := backupMgr.CreateBackup(targetPath, backupID)
+				if err != nil {
+					log.Printf("%s", i18n.Warning(i18n.MsgBackupFailed, err))
+					// Continue anyway - backup failure shouldn't stop installation
+				} else {
+					backupMetadata.Entries = append(backupMetadata.Entries, *backupEntry)
+				}
 			}
 
 			existingLink, err := os.Readlink(targetPath)
@@ -230,6 +262,15 @@ func InstallSymlinksFunc(*cobra.Command, []string) {
 		}
 
 		os.Exit(1)
+	}
+
+	// Save backup metadata if we created any backups
+	if len(backupMetadata.Entries) > 0 {
+		if err := backupMgr.SaveMetadata(backupMetadata); err != nil {
+			log.Printf("%s", i18n.Warning(i18n.MsgBackupFailed, err))
+		} else if cfg.Verbose {
+			fmt.Println(i18n.Success(i18n.MsgBackupComplete, backupID))
+		}
 	}
 }
 
