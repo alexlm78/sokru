@@ -21,6 +21,7 @@ func init() {
 	configCmd.AddCommand(configVerboseCmd)
 	configCmd.AddCommand(configDryrunCmd)
 	configCmd.AddCommand(configOsCmd)
+	configCmd.AddCommand(configLanguageCmd)
 	configCmd.AddCommand(configHelpCmd)
 	rootCmd.AddCommand(configCmd)
 }
@@ -44,6 +45,7 @@ var configCmd = &cobra.Command{
 		fmt.Printf("  Dotfiles Directory: %s\n", cfg.DotfilesDir)
 		fmt.Printf("  Symlinks File:      %s\n", cfg.SymlinksFile)
 		fmt.Printf("  Operating System:   %s\n", cfg.OS)
+		fmt.Printf("  Language:           %s\n", cfg.Language)
 		fmt.Printf("  Verbose:            %v\n", cfg.Verbose)
 		fmt.Printf("  Dry Run:            %v\n", cfg.DryRun)
 	},
@@ -66,6 +68,7 @@ var configShowCmd = &cobra.Command{
 		fmt.Printf("  Dotfiles Directory: %s\n", cfg.DotfilesDir)
 		fmt.Printf("  Symlinks File:      %s\n", cfg.SymlinksFile)
 		fmt.Printf("  Operating System:   %s\n", cfg.OS)
+		fmt.Printf("  Language:           %s\n", cfg.Language)
 		fmt.Printf("  Verbose:            %v\n", cfg.Verbose)
 		fmt.Printf("  Dry Run:            %v\n", cfg.DryRun)
 	},
@@ -239,6 +242,43 @@ var configOsCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		fmt.Printf("OS set to: %s\n", osName)
+	},
+}
+
+var configLanguageCmd = &cobra.Command{
+	Use:   "language [lang]",
+	Short: "Set the language (en, es)",
+	Long:  `This command will allow you to set the language (e.g., en for English, es for Spanish).`,
+	Args:  cobra.MaximumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		cfg, err := config.GetConfig()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: Failed to get config: %v\n", err)
+			os.Exit(1)
+		}
+
+		if len(args) == 0 {
+			// Display current value
+			fmt.Printf("Current language setting: %s\n", cfg.Language)
+			return
+		}
+
+		// Validate language
+		lang := strings.ToLower(args[0])
+		if lang != "en" && lang != "es" {
+			fmt.Fprintf(os.Stderr, "Error: Invalid language '%s'. Valid options are: en, es\n", args[0])
+			os.Exit(1)
+		}
+
+		// Update value
+		err = config.UpdateConfig(func(c *config.Config) {
+			c.Language = lang
+		})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error: Failed to update config: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("Language set to: %s\n", lang)
 	},
 }
 

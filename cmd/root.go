@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/alexlm78/sokru/internal/config"
+	"github.com/alexlm78/sokru/internal/i18n"
 	"github.com/spf13/cobra"
 )
 
@@ -39,6 +40,13 @@ func init() {
 		cfg = config.GetDefaultConfig()
 	}
 	config.SetConfig(cfg)
+
+	// Initialize i18n with configured language
+	if cfg.Language == "es" {
+		i18n.SetLanguage(i18n.Spanish)
+	} else {
+		i18n.SetLanguage(i18n.English)
+	}
 
 	// Set up persistent flags
 	rootCmd.PersistentFlags().BoolVarP(&cfg.Verbose, "verbose", "v", cfg.Verbose, "Prints the details of the response such as protocol, status, and headers.")

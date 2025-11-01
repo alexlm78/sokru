@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"github.com/alexlm78/sokru/internal/config"
+	"github.com/alexlm78/sokru/internal/i18n"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -64,7 +65,7 @@ func InstallSymlinksFunc(*cobra.Command, []string) {
 	// Get configuration
 	cfg, err := config.GetConfig()
 	if err != nil {
-		log.Fatalf("Error loading configuration: %v", err)
+		log.Fatalf("%s", i18n.Error(i18n.MsgErrorLoadingConfig, err))
 	}
 
 	// Expand path if it contains ~
@@ -72,29 +73,29 @@ func InstallSymlinksFunc(*cobra.Command, []string) {
 
 	// Check if symlinks file exists
 	if _, err := os.Stat(symlinkFile); os.IsNotExist(err) {
-		log.Fatalf("Symlinks file not found: %s\nPlease create the file or update the configuration with: sok config symlinkfile <path>", symlinkFile)
+		log.Fatalf("%s", i18n.Error(i18n.MsgSymlinkFileNotFound, symlinkFile))
 	}
 
 	// Verbose output
 	if cfg.Verbose {
-		fmt.Printf("Reading symlinks configuration from: %s\n", symlinkFile)
+		fmt.Println(i18n.Info(i18n.MsgReadingSymlinksFrom, symlinkFile))
 	}
 
 	// Read the YAML file
 	data, err := os.ReadFile(symlinkFile)
 	if err != nil {
-		log.Fatalf("Error reading YAML file: %v", err)
+		log.Fatalf("%s", i18n.Error(i18n.MsgErrorReadingFile, err))
 	}
 
 	// Unmarshal YAML to struct
 	var symlinkConfigs []SymlinkConfig
 	err = yaml.Unmarshal(data, &symlinkConfigs)
 	if err != nil {
-		log.Fatalf("Error parsing YAML: %v", err)
+		log.Fatalf("%s", i18n.Error(i18n.MsgErrorParsingYAML, err))
 	}
 
 	if cfg.Verbose {
-		fmt.Printf("Found %d symlink configuration(s)\n", len(symlinkConfigs))
+		fmt.Println(i18n.Info(i18n.MsgFoundConfigurations, len(symlinkConfigs)))
 	}
 
 	// Iterate over items and create symbolic links
@@ -105,7 +106,7 @@ func InstallSymlinksFunc(*cobra.Command, []string) {
 
 			// Check if dry-run mode is enabled
 			if cfg.DryRun {
-				fmt.Printf("[DRY-RUN] Would create symlink: %s -> %s\n", targetPath, sourcePath)
+				fmt.Println(i18n.Info(i18n.MsgDryRunWouldCreate, targetPath, sourcePath))
 				continue
 			}
 
@@ -113,31 +114,31 @@ func InstallSymlinksFunc(*cobra.Command, []string) {
 			if err == nil {
 				if existingLink == sourcePath {
 					if cfg.Verbose {
-						fmt.Printf("Symlink already exists and is correct: %s -> %s\n", targetPath, sourcePath)
+						fmt.Println(i18n.Success(i18n.MsgSymlinkAlreadyExists, targetPath, sourcePath))
 					}
 					continue
 				} else {
 					// Remove existing link if it points to a different destination
 					err = os.Remove(targetPath)
 					if err != nil {
-						log.Printf("Error removing existing symlink at %s: %v", targetPath, err)
+						log.Printf("%s", i18n.Error(i18n.MsgErrorRemovingSymlink, targetPath, err))
 						continue
 					}
 					if cfg.Verbose {
-						fmt.Printf("Existing symlink removed: %s\n", targetPath)
+						fmt.Println(i18n.Success(i18n.MsgExistingSymlinkRemoved, targetPath))
 					}
 				}
 			} else if !os.IsNotExist(err) {
-				log.Printf("Error checking symlink at %s: %v", targetPath, err)
+				log.Printf("%s", i18n.Error(i18n.MsgErrorCheckingFile, targetPath, err))
 				continue
 			}
 
 			// Create the new symbolic link
 			err = os.Symlink(sourcePath, targetPath)
 			if err != nil {
-				log.Printf("Error creating symlink from %s to %s: %v", targetPath, sourcePath, err)
+				log.Printf("%s", i18n.Error(i18n.MsgErrorCreatingSymlink, targetPath, sourcePath, err))
 			} else {
-				fmt.Printf("Symlink created: %s -> %s\n", targetPath, sourcePath)
+				fmt.Println(i18n.Success(i18n.MsgSymlinkCreated, targetPath, sourcePath))
 			}
 		}
 	}
@@ -147,7 +148,7 @@ func UninstallSymlinksFunc(*cobra.Command, []string) {
 	// Get configuration
 	cfg, err := config.GetConfig()
 	if err != nil {
-		log.Fatalf("Error loading configuration: %v", err)
+		log.Fatalf("%s", i18n.Error(i18n.MsgErrorLoadingConfig, err))
 	}
 
 	// Expand path if it contains ~
@@ -155,29 +156,29 @@ func UninstallSymlinksFunc(*cobra.Command, []string) {
 
 	// Check if symlinks file exists
 	if _, err := os.Stat(symlinkFile); os.IsNotExist(err) {
-		log.Fatalf("Symlinks file not found: %s\nPlease create the file or update the configuration with: sok config symlinkfile <path>", symlinkFile)
+		log.Fatalf("%s", i18n.Error(i18n.MsgSymlinkFileNotFound, symlinkFile))
 	}
 
 	// Verbose output
 	if cfg.Verbose {
-		fmt.Printf("Reading symlinks configuration from: %s\n", symlinkFile)
+		fmt.Println(i18n.Info(i18n.MsgReadingSymlinksFrom, symlinkFile))
 	}
 
 	// Read the YAML file
 	data, err := os.ReadFile(symlinkFile)
 	if err != nil {
-		log.Fatalf("Error reading YAML file: %v", err)
+		log.Fatalf("%s", i18n.Error(i18n.MsgErrorReadingFile, err))
 	}
 
 	// Unmarshal YAML to struct
 	var symlinkConfigs []SymlinkConfig
 	err = yaml.Unmarshal(data, &symlinkConfigs)
 	if err != nil {
-		log.Fatalf("Error parsing YAML: %v", err)
+		log.Fatalf("%s", i18n.Error(i18n.MsgErrorParsingYAML, err))
 	}
 
 	if cfg.Verbose {
-		fmt.Printf("Found %d symlink configuration(s)\n", len(symlinkConfigs))
+		fmt.Println(i18n.Info(i18n.MsgFoundConfigurations, len(symlinkConfigs)))
 	}
 
 	// Counters for summary
@@ -193,20 +194,20 @@ func UninstallSymlinksFunc(*cobra.Command, []string) {
 			fileInfo, err := os.Lstat(targetPath)
 			if os.IsNotExist(err) {
 				if cfg.Verbose {
-					fmt.Printf("Symlink not found (already removed): %s\n", targetPath)
+					fmt.Println(i18n.Info(i18n.MsgSymlinkNotFound, targetPath))
 				}
 				notFound++
 				continue
 			}
 			if err != nil {
-				log.Printf("Error checking file at %s: %v", targetPath, err)
+				log.Printf("%s", i18n.Error(i18n.MsgErrorCheckingFile, targetPath, err))
 				skipped++
 				continue
 			}
 
 			// Check if it's a symlink
 			if fileInfo.Mode()&os.ModeSymlink == 0 {
-				log.Printf("Warning: %s is not a symlink, skipping (will not remove regular files)", targetPath)
+				log.Printf("%s", i18n.Warning(i18n.MsgNotSymlink, targetPath))
 				notSymlink++
 				continue
 			}
@@ -214,7 +215,7 @@ func UninstallSymlinksFunc(*cobra.Command, []string) {
 			// Read the symlink to verify it points to the expected source
 			existingLink, err := os.Readlink(targetPath)
 			if err != nil {
-				log.Printf("Error reading symlink at %s: %v", targetPath, err)
+				log.Printf("%s", i18n.Error(i18n.MsgErrorReadingSymlink, targetPath, err))
 				skipped++
 				continue
 			}
@@ -222,8 +223,7 @@ func UninstallSymlinksFunc(*cobra.Command, []string) {
 			// Verify the symlink points to the expected source
 			if existingLink != sourcePath {
 				if cfg.Verbose {
-					fmt.Printf("Symlink points to different source: %s -> %s (expected: %s), skipping\n",
-						targetPath, existingLink, sourcePath)
+					fmt.Println(i18n.Warning(i18n.MsgSymlinkWrongTarget, targetPath, existingLink, sourcePath))
 				}
 				skipped++
 				continue
@@ -231,7 +231,7 @@ func UninstallSymlinksFunc(*cobra.Command, []string) {
 
 			// Check if dry-run mode is enabled
 			if cfg.DryRun {
-				fmt.Printf("[DRY-RUN] Would remove symlink: %s -> %s\n", targetPath, sourcePath)
+				fmt.Println(i18n.Info(i18n.MsgDryRunWouldRemove, targetPath, sourcePath))
 				removed++
 				continue
 			}
@@ -239,30 +239,30 @@ func UninstallSymlinksFunc(*cobra.Command, []string) {
 			// Remove the symlink
 			err = os.Remove(targetPath)
 			if err != nil {
-				log.Printf("Error removing symlink at %s: %v", targetPath, err)
+				log.Printf("%s", i18n.Error(i18n.MsgErrorRemovingSymlink, targetPath, err))
 				skipped++
 			} else {
-				fmt.Printf("Symlink removed: %s -> %s\n", targetPath, sourcePath)
+				fmt.Println(i18n.Success(i18n.MsgSymlinkRemoved, targetPath, sourcePath))
 				removed++
 			}
 		}
 	}
 
 	// Print summary
-	fmt.Println("\n--- Uninstall Summary ---")
+	fmt.Printf("\n=== %s ===\n", i18n.T(i18n.MsgUninstallSummary))
 	if cfg.DryRun {
-		fmt.Printf("Would remove: %d symlink(s)\n", removed)
+		fmt.Println(i18n.Info(i18n.MsgWouldRemove, removed))
 	} else {
-		fmt.Printf("Removed: %d symlink(s)\n", removed)
+		fmt.Println(i18n.Success(i18n.MsgRemoved, removed))
 	}
 	if notFound > 0 {
-		fmt.Printf("Not found: %d symlink(s)\n", notFound)
+		fmt.Println(i18n.Info(i18n.MsgNotFound, notFound))
 	}
 	if notSymlink > 0 {
-		fmt.Printf("Not symlinks (skipped): %d file(s)\n", notSymlink)
+		fmt.Println(i18n.Warning(i18n.MsgNotSymlinks, notSymlink))
 	}
 	if skipped > 0 {
-		fmt.Printf("Skipped: %d symlink(s)\n", skipped)
+		fmt.Println(i18n.Warning(i18n.MsgSkipped, skipped))
 	}
 }
 
@@ -270,7 +270,7 @@ func ListSymlinksFunc(*cobra.Command, []string) {
 	// Get configuration
 	cfg, err := config.GetConfig()
 	if err != nil {
-		log.Fatalf("Error loading configuration: %v", err)
+		log.Fatalf("%s", i18n.Error(i18n.MsgErrorLoadingConfig, err))
 	}
 
 	// Expand path if it contains ~
@@ -278,33 +278,33 @@ func ListSymlinksFunc(*cobra.Command, []string) {
 
 	// Check if symlinks file exists
 	if _, err := os.Stat(symlinkFile); os.IsNotExist(err) {
-		log.Fatalf("Symlinks file not found: %s\nPlease create the file or update the configuration with: sok config symlinkfile <path>", symlinkFile)
+		log.Fatalf("%s", i18n.Error(i18n.MsgSymlinkFileNotFound, symlinkFile))
 	}
 
 	// Verbose output
 	if cfg.Verbose {
-		fmt.Printf("Reading symlinks configuration from: %s\n\n", symlinkFile)
+		fmt.Printf("%s\n\n", i18n.Info(i18n.MsgReadingSymlinksFrom, symlinkFile))
 	}
 
 	// Read the YAML file
 	data, err := os.ReadFile(symlinkFile)
 	if err != nil {
-		log.Fatalf("Error reading YAML file: %v", err)
+		log.Fatalf("%s", i18n.Error(i18n.MsgErrorReadingFile, err))
 	}
 
 	// Unmarshal YAML to struct
 	var symlinkConfigs []SymlinkConfig
 	err = yaml.Unmarshal(data, &symlinkConfigs)
 	if err != nil {
-		log.Fatalf("Error parsing YAML: %v", err)
+		log.Fatalf("%s", i18n.Error(i18n.MsgErrorParsingYAML, err))
 	}
 
 	// Print header
-	fmt.Println("Symlinks Status:")
+	fmt.Println(i18n.T(i18n.MsgSymlinksStatus))
 	fmt.Println("================")
 	fmt.Println()
-	fmt.Printf("%-8s %-40s -> %s\n", "Status", "Target", "Source")
-	fmt.Println(fmt.Sprintf("%s", "─────────────────────────────────────────────────────────────────────────────────────────────"))
+	fmt.Printf("%-8s %-40s -> %s\n", i18n.T(i18n.MsgStatus), i18n.T(i18n.MsgTarget), i18n.T(i18n.MsgSource))
+	fmt.Println("─────────────────────────────────────────────────────────────────────────────────────────────")
 
 	// Counters for summary
 	var installed, wrongTarget, notInstalled, regularFile int
@@ -326,7 +326,7 @@ func ListSymlinksFunc(*cobra.Command, []string) {
 			}
 
 			if err != nil {
-				log.Printf("Error checking file at %s: %v", targetPath, err)
+				log.Printf("%s", i18n.Error(i18n.MsgErrorCheckingFile, targetPath, err))
 				continue
 			}
 
@@ -341,7 +341,7 @@ func ListSymlinksFunc(*cobra.Command, []string) {
 			// Read the symlink
 			existingLink, err := os.Readlink(targetPath)
 			if err != nil {
-				log.Printf("Error reading symlink at %s: %v", targetPath, err)
+				log.Printf("%s", i18n.Error(i18n.MsgErrorReadingSymlink, targetPath, err))
 				continue
 			}
 
@@ -363,26 +363,26 @@ func ListSymlinksFunc(*cobra.Command, []string) {
 
 	// Print summary
 	fmt.Println()
-	fmt.Println("Summary:")
+	fmt.Println(i18n.T(i18n.MsgSummary))
 	fmt.Println("--------")
-	fmt.Printf("✅ Installed correctly:    %d\n", installed)
+	fmt.Printf("✅ %s\n", i18n.T(i18n.MsgInstalledCorrectly, installed))
 	if wrongTarget > 0 {
-		fmt.Printf("⚠️  Wrong target:          %d\n", wrongTarget)
+		fmt.Printf("⚠️  %s\n", i18n.T(i18n.MsgWrongTarget, wrongTarget))
 	}
 	if notInstalled > 0 {
-		fmt.Printf("❌ Not installed:         %d\n", notInstalled)
+		fmt.Printf("❌ %s\n", i18n.T(i18n.MsgNotInstalled, notInstalled))
 	}
 	if regularFile > 0 {
-		fmt.Printf("⛔ Regular file exists:   %d\n", regularFile)
+		fmt.Printf("⛔ %s\n", i18n.T(i18n.MsgRegularFileExists, regularFile))
 	}
-	fmt.Printf("\nTotal symlinks configured: %d\n", installed+wrongTarget+notInstalled+regularFile)
+	fmt.Printf("\n%s\n", i18n.T(i18n.MsgTotalSymlinks, installed+wrongTarget+notInstalled+regularFile))
 
 	// Show legend
-	fmt.Println("\nLegend:")
-	fmt.Println("  ✅ = Symlink installed and points to correct source")
-	fmt.Println("  ⚠️  = Symlink exists but points to different source")
-	fmt.Println("  ❌ = Symlink not installed")
-	fmt.Println("  ⛔ = Regular file exists at target location (not a symlink)")
+	fmt.Printf("\n%s\n", i18n.T(i18n.MsgLegend))
+	fmt.Printf("  %s\n", i18n.T(i18n.MsgLegendInstalled))
+	fmt.Printf("  %s\n", i18n.T(i18n.MsgLegendWrongTarget))
+	fmt.Printf("  %s\n", i18n.T(i18n.MsgLegendNotInstalled))
+	fmt.Printf("  %s\n", i18n.T(i18n.MsgLegendRegularFile))
 }
 
 func init() {

@@ -18,6 +18,7 @@ type Config struct {
 	DotfilesDir  string `yaml:"dotfiles_dir"`
 	SymlinksFile string `yaml:"symlinks_file"`
 	OS           string `yaml:"os"`
+	Language     string `yaml:"language"`
 	Verbose      bool   `yaml:"verbose"`
 	DryRun       bool   `yaml:"dry_run"`
 }
@@ -41,6 +42,7 @@ func GetDefaultConfig() *Config {
 		DotfilesDir:  filepath.Join(homeDir, "dotfiles"),
 		SymlinksFile: filepath.Join(homeDir, "dotfiles", "symlinks.yaml"),
 		OS:           runtime.GOOS,
+		Language:     "en",
 		Verbose:      false,
 		DryRun:       false,
 	}
