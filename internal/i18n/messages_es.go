@@ -55,6 +55,15 @@ func getSpanishMessages() map[MessageKey]string {
 		MsgFilteringByOS:          "Filtrando enlaces simbólicos para SO: %s",
 		MsgUsingCommonLinks:       "Usando enlaces comunes (todos los SO)",
 		MsgUsingOSSpecificLinks:   "Usando enlaces específicos del SO para: %s",
+		
+		// Rollback messages
+		MsgRollbackStarting:       "Ocurrió un error, iniciando reversión de %d acción(es)...",
+		MsgRollbackComplete:       "Reversión completada exitosamente",
+		MsgRollbackFailed:         "Reversión completada con errores: %v",
+		MsgRollbackAction:         "Revirtiendo acción %d/%d",
+		MsgRollbackRemoved:        "Enlace simbólico creado eliminado: %s",
+		MsgRollbackRestored:       "Enlace simbólico anterior restaurado: %s -> %s",
+		MsgRollbackRecreated:      "Enlace simbólico eliminado recreado: %s -> %s",
 
 		// Apply messages
 		MsgApplyingChanges:    "Aplicando cambios de configuración...",

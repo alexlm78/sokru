@@ -11,6 +11,7 @@ import (
 
 	"github.com/alexlm78/sokru/internal/config"
 	"github.com/alexlm78/sokru/internal/i18n"
+	"github.com/alexlm78/sokru/internal/rollback"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -150,6 +151,10 @@ func InstallSymlinksFunc(*cobra.Command, []string) {
 		fmt.Println(i18n.Info(i18n.MsgFoundConfigurations, len(symlinkConfigs)))
 	}
 
+	// Create rollback tracker
+	tracker := rollback.NewTracker()
+	var hasError bool
+
 	// Iterate over items and create symbolic links
 	for _, entry := range symlinkConfigs {
 		// Get links for current OS
@@ -177,25 +182,54 @@ func InstallSymlinksFunc(*cobra.Command, []string) {
 					err = os.Remove(targetPath)
 					if err != nil {
 						log.Printf("%s", i18n.Error(i18n.MsgErrorRemovingSymlink, targetPath, err))
-						continue
+						hasError = true
+						break
 					}
 					if cfg.Verbose {
 						fmt.Println(i18n.Success(i18n.MsgExistingSymlinkRemoved, targetPath))
 					}
+					// Track the update for rollback
+					tracker.TrackUpdated(targetPath, sourcePath, existingLink)
 				}
 			} else if !os.IsNotExist(err) {
 				log.Printf("%s", i18n.Error(i18n.MsgErrorCheckingFile, targetPath, err))
-				continue
+				hasError = true
+				break
 			}
 
 			// Create the new symbolic link
 			err = os.Symlink(sourcePath, targetPath)
 			if err != nil {
 				log.Printf("%s", i18n.Error(i18n.MsgErrorCreatingSymlink, targetPath, sourcePath, err))
+				hasError = true
+				break
 			} else {
 				fmt.Println(i18n.Success(i18n.MsgSymlinkCreated, targetPath, sourcePath))
+				// Track creation only if it wasn't an update
+				if existingLink == "" || os.IsNotExist(err) {
+					tracker.TrackCreated(targetPath, sourcePath)
+				}
 			}
 		}
+
+		// If error occurred, break outer loop too
+		if hasError {
+			break
+		}
+	}
+
+	// Perform rollback if there was an error
+	if hasError && tracker.HasActions() {
+		fmt.Println()
+		fmt.Println(i18n.Warning(i18n.MsgRollbackStarting, tracker.Count()))
+
+		if err := tracker.Rollback(); err != nil {
+			log.Printf("%s", i18n.Error(i18n.MsgRollbackFailed, err))
+		} else {
+			fmt.Println(i18n.Success(i18n.MsgRollbackComplete))
+		}
+
+		os.Exit(1)
 	}
 }
 

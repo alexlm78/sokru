@@ -55,6 +55,15 @@ const (
 	MsgFilteringByOS          MessageKey = "filtering_by_os"
 	MsgUsingCommonLinks       MessageKey = "using_common_links"
 	MsgUsingOSSpecificLinks   MessageKey = "using_os_specific_links"
+	
+	// Rollback messages
+	MsgRollbackStarting       MessageKey = "rollback_starting"
+	MsgRollbackComplete       MessageKey = "rollback_complete"
+	MsgRollbackFailed         MessageKey = "rollback_failed"
+	MsgRollbackAction         MessageKey = "rollback_action"
+	MsgRollbackRemoved        MessageKey = "rollback_removed"
+	MsgRollbackRestored       MessageKey = "rollback_restored"
+	MsgRollbackRecreated      MessageKey = "rollback_recreated"
 
 	// Apply messages
 	MsgApplyingChanges    MessageKey = "applying_changes"
@@ -167,6 +176,15 @@ func getEnglishMessages() map[MessageKey]string {
 		MsgFilteringByOS:          "Filtering symlinks for OS: %s",
 		MsgUsingCommonLinks:       "Using common links (all OS)",
 		MsgUsingOSSpecificLinks:   "Using OS-specific links for: %s",
+		
+		// Rollback messages
+		MsgRollbackStarting:       "Error occurred, starting rollback of %d action(s)...",
+		MsgRollbackComplete:       "Rollback completed successfully",
+		MsgRollbackFailed:         "Rollback completed with errors: %v",
+		MsgRollbackAction:         "Rolling back action %d/%d",
+		MsgRollbackRemoved:        "Removed created symlink: %s",
+		MsgRollbackRestored:       "Restored previous symlink: %s -> %s",
+		MsgRollbackRecreated:      "Recreated removed symlink: %s -> %s",
 
 		// Apply messages
 		MsgApplyingChanges:    "Applying configuration changes...",

@@ -10,6 +10,8 @@ import (
 	"os"
 
 	"github.com/alexlm78/sokru/internal/config"
+	"github.com/alexlm78/sokru/internal/i18n"
+	"github.com/alexlm78/sokru/internal/rollback"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -73,7 +75,7 @@ func ApplyFunc(cmd *cobra.Command, args []string) {
 	for _, entry := range symlinkConfigs {
 		// Get links for current OS
 		links := entry.getLinksForOS(cfg.OS)
-		
+
 		for target, source := range links {
 			targetPath := expandPath(target)
 			sourcePath := expandPath(source)
@@ -136,43 +138,68 @@ func ApplyFunc(cmd *cobra.Command, args []string) {
 
 	fmt.Println("\n=== Applying Changes ===")
 
-	// Create new symlinks
+	// Create rollback tracker
+	tracker := rollback.NewTracker()
 	var created, updated, failed int
+	var hasError bool
+
+	// Create new symlinks
 	for targetPath, sourcePath := range configuredSymlinks {
 		existingLink, err := os.Readlink(targetPath)
 
 		if os.IsNotExist(err) {
 			// Create new symlink
 			if err := os.Symlink(sourcePath, targetPath); err != nil {
-				log.Printf("✗ Failed to create %s: %v", targetPath, err)
+				log.Printf("%s", i18n.Error(i18n.MsgErrorCreatingSymlink, targetPath, sourcePath, err))
 				failed++
+				hasError = true
+				break
 			} else {
 				if cfg.Verbose {
-					fmt.Printf("✓ Created: %s -> %s\n", targetPath, sourcePath)
+					fmt.Println(i18n.Success(i18n.MsgCreated, targetPath, sourcePath))
 				}
 				created++
+				tracker.TrackCreated(targetPath, sourcePath)
 			}
 		} else if err == nil && existingLink != sourcePath {
 			// Update existing symlink
 			if err := os.Remove(targetPath); err != nil {
-				log.Printf("✗ Failed to remove old symlink %s: %v", targetPath, err)
+				log.Printf("%s", i18n.Error(i18n.MsgErrorRemovingSymlink, targetPath, err))
 				failed++
-				continue
+				hasError = true
+				break
 			}
 			if err := os.Symlink(sourcePath, targetPath); err != nil {
-				log.Printf("✗ Failed to create updated symlink %s: %v", targetPath, err)
+				log.Printf("%s", i18n.Error(i18n.MsgErrorCreatingSymlink, targetPath, sourcePath, err))
 				failed++
+				hasError = true
+				break
 			} else {
 				if cfg.Verbose {
-					fmt.Printf("✓ Updated: %s -> %s\n", targetPath, sourcePath)
+					fmt.Println(i18n.Success(i18n.MsgUpdated, targetPath, sourcePath))
 				}
 				updated++
+				tracker.TrackUpdated(targetPath, sourcePath, existingLink)
 			}
 		}
 	}
 
+	// Perform rollback if there was an error
+	if hasError && tracker.HasActions() {
+		fmt.Println()
+		fmt.Println(i18n.Warning(i18n.MsgRollbackStarting, tracker.Count()))
+
+		if err := tracker.Rollback(); err != nil {
+			log.Printf("%s", i18n.Error(i18n.MsgRollbackFailed, err))
+		} else {
+			fmt.Println(i18n.Success(i18n.MsgRollbackComplete))
+		}
+
+		os.Exit(1)
+	}
+
 	// 7. Summary
-	fmt.Println("\n=== Apply Summary ===")
+	fmt.Printf("\n=== %s ===\n", i18n.T(i18n.MsgApplySummary))
 	if created > 0 {
 		fmt.Printf("Created: %d symlink(s)\n", created)
 	}
@@ -186,7 +213,7 @@ func ApplyFunc(cmd *cobra.Command, args []string) {
 		fmt.Printf("Failed: %d symlink(s)\n", failed)
 	}
 
-	fmt.Println("\n✓ Configuration applied successfully!")
+	fmt.Println(i18n.Success(i18n.MsgConfigApplied))
 }
 
 func init() {
