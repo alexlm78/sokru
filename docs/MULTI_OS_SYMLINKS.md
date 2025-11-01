@@ -117,7 +117,7 @@ This means OS-specific symlinks can override common ones.
 
 ## How It Works
 
-1. **OS Detection**: Sokru reads the `os` field from your configuration (`~/.sokru/config.yaml`)
+1. **OS Detection**: Sokru reads the `os` field from your configuration (`~/.config/sokru/config.yaml`)
 2. **Filtering**: When processing symlinks, it filters entries based on:
    - If an entry has an `os` field, it only processes it if it matches the current OS
    - Within each entry, it combines `common` and OS-specific sections

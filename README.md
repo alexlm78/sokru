@@ -127,7 +127,7 @@ sok restore delete <id>       # Delete a specific backup
 
 ## Configuration
 
-Configuration is stored in `~/.sokru/config.yaml`:
+Configuration is stored in `~/.config/sokru/config.yaml`:
 
 ```yaml
 dotfiles_dir: /home/user/dotfiles

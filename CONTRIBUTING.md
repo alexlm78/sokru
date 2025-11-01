@@ -266,7 +266,7 @@ config, _ := config.LoadConfig()
 - Document why, not what (code shows what)
 
 ```go
-// LoadConfig reads the configuration from ~/.sokru/config.yaml.
+// LoadConfig reads the configuration from ~/.config/sokru/config.yaml.
 // If the file doesn't exist, it returns the default configuration.
 func LoadConfig() (*Config, error) {
     // Implementation

@@ -25,13 +25,13 @@ Backups are automatically created when:
 All backups are stored in:
 
 ```data
-~/.sokru/backups/
+~/.config/sokru/backups/
 ```
 
 Each backup session creates a subdirectory with a unique ID:
 
 ```data
-~/.sokru/backups/
+~/.config/sokru/backups/
 ├── 20241101-143022.123/
 │   ├── metadata.json
 │   ├── bashrc
@@ -126,14 +126,14 @@ Each backup includes a `metadata.json` file with:
   "entries": [
     {
       "original_path": "/home/user/.bashrc",
-      "backup_path": "/home/user/.sokru/backups/20241101-143022.123/bashrc",
+      "backup_path": "/home/user/.config/sokru/backups/20241101-143022.123/bashrc",
       "is_symlink": false,
       "timestamp": "2024-11-01T14:30:22.123456-06:00",
       "file_mode": 420
     },
     {
       "original_path": "/home/user/.vimrc",
-      "backup_path": "/home/user/.sokru/backups/20241101-143022.123/vimrc",
+      "backup_path": "/home/user/.config/sokru/backups/20241101-143022.123/vimrc",
       "is_symlink": true,
       "symlink_target": "/home/user/.dotfiles/vim/vimrc",
       "timestamp": "2024-11-01T14:30:22.123456-06:00",
@@ -271,7 +271,7 @@ Backups consume disk space. Monitor usage:
 
 ```bash
 # Check backup directory size
-du -sh ~/.sokru/backups/
+du -sh ~/.config/sokru/backups/
 
 # List backups with details
 sok restore list
@@ -296,7 +296,7 @@ If you see:
 **Actions:**
 
 1. Check file permissions
-2. Ensure write access to `~/.sokru/backups/`
+2. Ensure write access to `~/.config/sokru/backups/`
 3. Installation continues (backup is optional)
 
 ### Restore Failed
@@ -320,7 +320,7 @@ If disk is full:
 
 ```bash
 # Check disk space
-df -h ~/.sokru/
+df -h ~/.config/sokru/
 
 # Delete old backups
 sok restore list
@@ -334,10 +334,10 @@ If metadata is corrupted:
 ```bash
 # Backup won't appear in list
 # Manually inspect backup directory
-ls -la ~/.sokru/backups/
+ls -la ~/.config/sokru/backups/
 
 # Delete corrupted backup directory
-rm -rf ~/.sokru/backups/<corrupted-id>
+rm -rf ~/.config/sokru/backups/<corrupted-id>
 ```
 
 ## Advanced Usage
@@ -348,14 +348,14 @@ Backups are stored as regular files and can be inspected manually:
 
 ```bash
 # View backup metadata
-cat ~/.sokru/backups/20241101-143022.123/metadata.json | jq
+cat ~/.config/sokru/backups/20241101-143022.123/metadata.json | jq
 
 # View backed up file
-cat ~/.sokru/backups/20241101-143022.123/bashrc
+cat ~/.config/sokru/backups/20241101-143022.123/bashrc
 
 # Check symlink info in metadata
 jq '.entries[] | select(.is_symlink == true)' \
-  ~/.sokru/backups/20241101-143022.123/metadata.json
+  ~/.config/sokru/backups/20241101-143022.123/metadata.json
 ```
 
 ### Selective Restore
@@ -364,7 +364,7 @@ Currently, restore is all-or-nothing. For selective restore:
 
 ```bash
 # Manually copy specific file from backup
-cp ~/.sokru/backups/20241101-143022.123/bashrc ~/.bashrc
+cp ~/.config/sokru/backups/20241101-143022.123/bashrc ~/.bashrc
 
 # Or recreate specific symlink from metadata
 # (check metadata.json for symlink_target)
@@ -387,10 +387,10 @@ If backing up files with sensitive data:
 
 ```bash
 # Check backup directory permissions
-ls -la ~/.sokru/backups/
+ls -la ~/.config/sokru/backups/
 
 # Restrict if needed
-chmod 700 ~/.sokru/backups/
+chmod 700 ~/.config/sokru/backups/
 ```
 
 ## Limitations

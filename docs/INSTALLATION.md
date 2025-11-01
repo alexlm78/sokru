@@ -212,7 +212,7 @@ go run main.go --help
 ```bash
 # Coming soon: Official Docker image
 # docker pull alexlm78/sokru:latest
-# docker run -v ~/.dotfiles:/dotfiles -v ~/.sokru:/root/.sokru alexlm78/sokru sok --help
+# docker run -v ~/.dotfiles:/dotfiles -v ~/.config/sokru:/root/.config/sokru alexlm78/sokru sok --help
 ```
 
 ## Verify Installation
@@ -247,9 +247,9 @@ sok init
 
 This creates:
 
-- `~/.sokru/` directory
-- `~/.sokru/config.yaml` with default settings
-- `~/.sokru/backups/` directory
+- `~/.config/sokru/` directory
+- `~/.config/sokru/config.yaml` with default settings
+- `~/.config/sokru/backups/` directory
 
 ### 2. Configure Dotfiles Directory
 
@@ -367,11 +367,11 @@ sudo rm $(which sok)
 
 ```bash
 # Remove configuration and backups
-rm -rf ~/.sokru
+rm -rf ~/.config/sokru
 
 # This removes:
-# - Configuration file (~/.sokru/config.yaml)
-# - All backups (~/.sokru/backups/)
+# - Configuration file (~/.config/sokru/config.yaml)
+# - All backups (~/.config/sokru/backups/)
 ```
 
 ### Uninstall Symlinks

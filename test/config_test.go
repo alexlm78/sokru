@@ -74,7 +74,7 @@ func TestSaveAndLoadConfig(t *testing.T) {
 	}
 
 	// Verify config file was created
-	configPath := filepath.Join(tempDir, ".sokru", "config.yaml")
+	configPath := filepath.Join(tempDir, ".config", "sokru", "config.yaml")
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		t.Fatalf("Config file was not created at %s", configPath)
 	}
@@ -249,7 +249,7 @@ func TestConfigPathGeneration(t *testing.T) {
 		t.Fatalf("GetConfigPath failed: %v", err)
 	}
 
-	expectedPath := filepath.Join(tempDir, ".sokru", "config.yaml")
+	expectedPath := filepath.Join(tempDir, ".config", "sokru", "config.yaml")
 	if configPath != expectedPath {
 		t.Errorf("Expected config path '%s', got '%s'", expectedPath, configPath)
 	}

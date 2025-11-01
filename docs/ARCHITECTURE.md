@@ -124,7 +124,7 @@ Manages application configuration with YAML persistence.
 
 **Key responsibilities:**
 
-- Load configuration from `~/.sokru/config.yaml`
+- Load configuration from `~/.config/sokru/config.yaml`
 - Save configuration changes
 - Provide default configuration values
 - Global configuration singleton
@@ -183,7 +183,7 @@ Implements automatic backup and restore functionality.
 **Backup structure:**
 
 ```tree
-~/.sokru/backups/
+~/.config/sokru/backups/
 ├── 20241101-143022.123/
 │   ├── metadata.json
 │   ├── file1
@@ -226,7 +226,7 @@ const (
 1. User runs: sok symlinks install
        │
        ▼
-2. Load configuration from ~/.sokru/config.yaml
+2. Load configuration from ~/.config/sokru/config.yaml
        │
        ▼
 3. Read symlinks from configured file (e.g., ~/dotfiles/symlinks.yaml)
@@ -268,7 +268,7 @@ const (
 4. Update configuration in memory
        │
        ▼
-5. Save configuration to ~/.sokru/config.yaml
+5. Save configuration to ~/.config/sokru/config.yaml
        │
        ▼
 6. Update global configuration instance

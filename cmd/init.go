@@ -33,8 +33,8 @@ var initCmd = &cobra.Command{
 	This command will create the necessary files and directories to start using sokru.
 
 	This will create the following files and directories:
-	- .sokru/
-	- .sokru/config.yaml
+	- .config/sokru/
+	- .config/sokru/config.yaml
 	- .dotfiles/
 	- .dotfiles/symlinks.yaml
 	- .dotfiles/bash/
@@ -58,7 +58,7 @@ func InitFunc(cmd *cobra.Command, args []string) {
 	}
 
 	// Paths
-	sokruDir := filepath.Join(homeDir, ".sokru")
+	sokruDir := filepath.Join(homeDir, ".config", "sokru")
 	configFile := filepath.Join(sokruDir, "config.yaml")
 	dotfilesDir := filepath.Join(homeDir, "dotfiles")
 	symlinkFile := filepath.Join(dotfilesDir, "symlinks.yml")
@@ -67,7 +67,7 @@ func InitFunc(cmd *cobra.Command, args []string) {
 	var created []string
 	var skipped []string
 
-	// 1. Create ~/.sokru/ directory
+	// 1. Create ~/.config/sokru/ directory
 	if _, err := os.Stat(sokruDir); os.IsNotExist(err) {
 		if err := os.MkdirAll(sokruDir, 0755); err != nil {
 			fmt.Fprintf(os.Stderr, "Error: Failed to create %s: %v\n", sokruDir, err)
@@ -80,7 +80,7 @@ func InitFunc(cmd *cobra.Command, args []string) {
 		fmt.Printf("⚠ Directory already exists: %s\n", sokruDir)
 	}
 
-	// 2. Create ~/.sokru/config.yaml with defaults
+	// 2. Create ~/.config/sokru/config.yaml with defaults
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
 		cfg := config.GetDefaultConfig()
 		// Update paths to use the dotfiles directory we're creating

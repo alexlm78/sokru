@@ -144,12 +144,12 @@ func (m *Manager) copyFile(src, dst string) error {
 // SaveMetadata saves backup metadata to a JSON file
 func (m *Manager) SaveMetadata(metadata *BackupMetadata) error {
 	sessionDir := filepath.Join(m.backupDir, metadata.ID)
-	
+
 	// Ensure session directory exists
 	if err := os.MkdirAll(sessionDir, 0755); err != nil {
 		return fmt.Errorf("failed to create session directory: %w", err)
 	}
-	
+
 	metadataPath := filepath.Join(sessionDir, "metadata.json")
 
 	data, err := json.MarshalIndent(metadata, "", "  ")
@@ -279,5 +279,5 @@ func GetDefaultBackupDir() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to get home directory: %w", err)
 	}
-	return filepath.Join(homeDir, ".sokru", "backups"), nil
+	return filepath.Join(homeDir, ".config", "sokru", "backups"), nil
 }

@@ -24,7 +24,7 @@ type Config struct {
 }
 
 const (
-	configDir  = ".sokru"
+	configDir  = ".config/sokru"
 	configFile = "config.yaml"
 )
 

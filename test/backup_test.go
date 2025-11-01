@@ -440,7 +440,7 @@ func TestGetDefaultBackupDir(t *testing.T) {
 		t.Error("GetDefaultBackupDir should not return empty string")
 	}
 
-	// Should contain .sokru/backups
+	// Should contain .config/sokru/backups
 	if !filepath.IsAbs(backupDir) {
 		t.Error("GetDefaultBackupDir should return absolute path")
 	}
