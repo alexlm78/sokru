@@ -2,7 +2,7 @@
 
 ## Overview
 
-Sokru uses Go's built-in testing framework along with GitHub Actions for continuous integration. All tests are centralized in the `test/` directory for easy maintenance and organization.
+Sokru uses Go's built-in testing framework. All tests are centralized in the `test/` directory for easy maintenance and organization.
 
 ## Test Structure
 
@@ -143,42 +143,7 @@ Tests for symlink configuration (`cmd` package):
 
 **Total**: 2 test functions, 14 test scenarios
 
-## Continuous Integration
-
-### GitHub Actions Workflow
-
-**File**: `.github/workflows/ci.yml`
-
-The CI pipeline runs on:
-
-- Push to `main` or `develop` branches
-- Pull requests to `main` or `develop` branches
-
-#### Jobs
-
-1. **Test Job**
-   - Runs on: Ubuntu, macOS, Windows
-   - Go versions: 1.21, 1.22
-   - Steps:
-     - Checkout code
-     - Set up Go
-     - Cache dependencies
-     - Download and verify dependencies
-     - Run tests with race detection
-     - Generate coverage report
-     - Upload coverage to Codecov (Ubuntu + Go 1.22 only)
-
-2. **Lint Job**
-   - Runs on: Ubuntu
-   - Uses: golangci-lint
-   - Checks: Code quality, style, potential bugs
-
-3. **Build Job**
-   - Runs on: Ubuntu, macOS, Windows
-   - Builds: Binary for each platform
-   - Uploads: Build artifacts (retained for 7 days)
-
-### Linting
+## Linting
 
 Configuration file: `.golangci.yml`
 
@@ -400,7 +365,6 @@ When contributing new features:
 2. Ensure all tests pass: `go test ./...`
 3. Check coverage: `go test -cover ./...`
 4. Run linter: `golangci-lint run`
-5. Ensure CI passes before merging
 
 ## Troubleshooting
 
@@ -436,7 +400,6 @@ golangci-lint run --fix
 - [Go Testing Package](https://pkg.go.dev/testing)
 - [Table Driven Tests](https://github.com/golang/go/wiki/TableDrivenTests)
 - [golangci-lint](https://golangci-lint.run/)
-- [Codecov](https://about.codecov.io/)
 
 ## See Also
 
