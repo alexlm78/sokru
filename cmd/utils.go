@@ -19,6 +19,11 @@ func expandPath(path string) string {
 	return path
 }
 
+// ExpandPathForTesting is exported for testing purposes
+func ExpandPathForTesting(path string) string {
+	return expandPath(path)
+}
+
 // validateOS checks if the OS is one of the supported values
 func validateOS(osName string) bool {
 	validOS := map[string]bool{
@@ -27,4 +32,9 @@ func validateOS(osName string) bool {
 		"windows": true,
 	}
 	return validOS[strings.ToLower(osName)]
+}
+
+// ValidateOSForTesting is exported for testing purposes
+func ValidateOSForTesting(osName string) bool {
+	return validateOS(osName)
 }

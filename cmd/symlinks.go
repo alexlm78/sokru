@@ -26,6 +26,11 @@ type SymlinkConfig struct {
 
 // getLinksForOS returns the appropriate links based on the current OS
 func (sc *SymlinkConfig) getLinksForOS(currentOS string) map[string]string {
+	return sc.GetLinksForOS(currentOS)
+}
+
+// GetLinksForOS is exported for testing purposes
+func (sc *SymlinkConfig) GetLinksForOS(currentOS string) map[string]string {
 	links := make(map[string]string)
 
 	// If this is a legacy format (only "link" field), return it
