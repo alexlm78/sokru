@@ -52,6 +52,9 @@ const (
 	MsgLegendWrongTarget      MessageKey = "legend_wrong_target"
 	MsgLegendNotInstalled     MessageKey = "legend_not_installed"
 	MsgLegendRegularFile      MessageKey = "legend_regular_file"
+	MsgFilteringByOS          MessageKey = "filtering_by_os"
+	MsgUsingCommonLinks       MessageKey = "using_common_links"
+	MsgUsingOSSpecificLinks   MessageKey = "using_os_specific_links"
 
 	// Apply messages
 	MsgApplyingChanges    MessageKey = "applying_changes"
@@ -161,6 +164,9 @@ func getEnglishMessages() map[MessageKey]string {
 		MsgLegendWrongTarget:      "⚠️  = Symlink exists but points to different source",
 		MsgLegendNotInstalled:     "❌ = Symlink not installed",
 		MsgLegendRegularFile:      "⛔ = Regular file exists at target location (not a symlink)",
+		MsgFilteringByOS:          "Filtering symlinks for OS: %s",
+		MsgUsingCommonLinks:       "Using common links (all OS)",
+		MsgUsingOSSpecificLinks:   "Using OS-specific links for: %s",
 
 		// Apply messages
 		MsgApplyingChanges:    "Applying configuration changes...",

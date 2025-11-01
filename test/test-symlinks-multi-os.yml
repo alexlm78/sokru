@@ -1,0 +1,36 @@
+# Test Multi-OS Symlinks Configuration
+
+# Common symlinks for all OS
+- common:
+    ~/test-common-file: ~/dotfiles/common/file
+    ~/test-common-config: ~/dotfiles/common/config
+
+# OS-specific symlinks
+- linux:
+    ~/test-linux-only: ~/dotfiles/linux/file
+  darwin:
+    ~/test-darwin-only: ~/dotfiles/darwin/file
+  windows:
+    ~/test-windows-only: ~/dotfiles/windows/file
+
+# Mixed: common + OS-specific (OS-specific overrides common)
+- common:
+    ~/test-mixed: ~/dotfiles/common/mixed
+  darwin:
+    ~/test-mixed: ~/dotfiles/darwin/mixed-override
+  linux:
+    ~/test-mixed: ~/dotfiles/linux/mixed-override
+
+# OS-filtered entry (only for darwin)
+- os: darwin
+  link:
+    ~/test-darwin-filtered: ~/dotfiles/darwin/filtered
+
+# OS-filtered entry (only for linux)
+- os: linux
+  link:
+    ~/test-linux-filtered: ~/dotfiles/linux/filtered
+
+# Legacy format (backward compatible)
+- link:
+    ~/test-legacy: ~/dotfiles/legacy/file

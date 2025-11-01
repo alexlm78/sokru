@@ -52,6 +52,9 @@ func getSpanishMessages() map[MessageKey]string {
 		MsgLegendWrongTarget:      "⚠️  = Enlace simbólico existe pero apunta a un origen diferente",
 		MsgLegendNotInstalled:     "❌ = Enlace simbólico no instalado",
 		MsgLegendRegularFile:      "⛔ = Archivo regular existe en la ubicación de destino (no es un enlace simbólico)",
+		MsgFilteringByOS:          "Filtrando enlaces simbólicos para SO: %s",
+		MsgUsingCommonLinks:       "Usando enlaces comunes (todos los SO)",
+		MsgUsingOSSpecificLinks:   "Usando enlaces específicos del SO para: %s",
 
 		// Apply messages
 		MsgApplyingChanges:    "Aplicando cambios de configuración...",

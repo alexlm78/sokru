@@ -68,10 +68,13 @@ func ApplyFunc(cmd *cobra.Command, args []string) {
 		fmt.Printf("✓ Read %d symlink configuration(s) from: %s\n", len(symlinkConfigs), symlinkFile)
 	}
 
-	// 3. Build a map of configured symlinks
+	// 3. Build a map of configured symlinks (filtered by OS)
 	configuredSymlinks := make(map[string]string)
 	for _, entry := range symlinkConfigs {
-		for target, source := range entry.Link {
+		// Get links for current OS
+		links := entry.getLinksForOS(cfg.OS)
+		
+		for target, source := range links {
 			targetPath := expandPath(target)
 			sourcePath := expandPath(source)
 			configuredSymlinks[targetPath] = sourcePath

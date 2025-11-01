@@ -16,7 +16,54 @@ import (
 )
 
 type SymlinkConfig struct {
-	Link map[string]string `yaml:"link"`
+	OS      string            `yaml:"os,omitempty"`
+	Link    map[string]string `yaml:"link"`
+	Common  map[string]string `yaml:"common,omitempty"`
+	Linux   map[string]string `yaml:"linux,omitempty"`
+	Darwin  map[string]string `yaml:"darwin,omitempty"`
+	Windows map[string]string `yaml:"windows,omitempty"`
+}
+
+// getLinksForOS returns the appropriate links based on the current OS
+func (sc *SymlinkConfig) getLinksForOS(currentOS string) map[string]string {
+	links := make(map[string]string)
+
+	// If this is a legacy format (only "link" field), return it
+	if len(sc.Link) > 0 && sc.OS == "" {
+		return sc.Link
+	}
+
+	// If OS is specified and doesn't match, skip this entry
+	if sc.OS != "" && sc.OS != currentOS {
+		return links
+	}
+
+	// Add common links first (lowest priority)
+	for target, source := range sc.Common {
+		links[target] = source
+	}
+
+	// Add OS-specific links (higher priority, can override common)
+	var osLinks map[string]string
+	switch currentOS {
+	case "linux":
+		osLinks = sc.Linux
+	case "darwin":
+		osLinks = sc.Darwin
+	case "windows":
+		osLinks = sc.Windows
+	}
+
+	for target, source := range osLinks {
+		links[target] = source
+	}
+
+	// Legacy "link" field has highest priority
+	for target, source := range sc.Link {
+		links[target] = source
+	}
+
+	return links
 }
 
 // symlinksCmd represents the symlinks command
@@ -100,7 +147,10 @@ func InstallSymlinksFunc(*cobra.Command, []string) {
 
 	// Iterate over items and create symbolic links
 	for _, entry := range symlinkConfigs {
-		for target, source := range entry.Link {
+		// Get links for current OS
+		links := entry.getLinksForOS(cfg.OS)
+
+		for target, source := range links {
 			targetPath := expandPath(target)
 			sourcePath := expandPath(source)
 
@@ -186,7 +236,10 @@ func UninstallSymlinksFunc(*cobra.Command, []string) {
 
 	// Iterate over items and remove symbolic links
 	for _, entry := range symlinkConfigs {
-		for target, source := range entry.Link {
+		// Get links for current OS
+		links := entry.getLinksForOS(cfg.OS)
+
+		for target, source := range links {
 			targetPath := expandPath(target)
 			sourcePath := expandPath(source)
 
@@ -311,7 +364,10 @@ func ListSymlinksFunc(*cobra.Command, []string) {
 
 	// Iterate over items and check status
 	for _, entry := range symlinkConfigs {
-		for target, source := range entry.Link {
+		// Get links for current OS
+		links := entry.getLinksForOS(cfg.OS)
+
+		for target, source := range links {
 			targetPath := expandPath(target)
 			sourcePath := expandPath(source)
 
