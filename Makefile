@@ -14,9 +14,13 @@ win:
 
 release:
 	GOOS=darwin GOARCH=amd64 go build -o build/macx86/sok main.go
+	GOOS=darwin GOARCH=amd64 go build -o build/macx86/sokru main.go
 	GOOS=darwin GOARCH=arm64 go build -o build/macm1/sok main.go
+	GOOS=darwin GOARCH=arm64 go build -o build/macm1/sokru main.go
 	GOOS=linux GOARCH=amd64 go build -o build/linux/sok main.go
+	GOOS=linux GOARCH=amd64 go build -o build/linux/sokru main.go
 	GOOS=windows GOARCH=amd64 go build -o build/win/sok.exe main.go
+	GOOS=windows GOARCH=amd64 go build -o build/win/sokru.exe main.go
 	zip -r build/sok-macx86.zip build/macx86
 	zip -r build/sok-macm1.zip build/macm1
 	zip -r build/sok-linux.zip build/linux
