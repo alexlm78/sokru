@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -15,9 +16,9 @@ func init() {
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print the version number of Sok",
-	Long:  `All software has versions. This is Sok's`,
+	Short: "Print the version number of Sokru (sok)",
+	Long:  `All software has versions. This is Sokru's (sok)`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Sok v0.1 -- HEAD")
+		fmt.Println("Sokru (sok) v1.0.0")
 	},
 }

@@ -213,14 +213,16 @@ sok symlinks install --dry-run --verbose
 
 If you have an existing `symlinks.yml` using the legacy format, it will continue to work without any changes. To migrate to the multi-OS format:
 
-### Before (Legacy):
+### Before (Legacy)
+
 ```yaml
 - link:
     ~/.bashrc: ~/.dotfiles/bash/bashrc
     ~/.vimrc: ~/.dotfiles/vim/vimrc
 ```
 
-### After (Multi-OS):
+### After (Multi-OS)
+
 ```yaml
 - common:
     ~/.bashrc: ~/.dotfiles/bash/bashrc
@@ -243,6 +245,7 @@ Or with OS-specific configurations:
 ### Symlinks Not Being Created
 
 1. Check your OS configuration:
+
    ```bash
    sok config show
    ```
@@ -250,6 +253,7 @@ Or with OS-specific configurations:
 2. Verify the OS field in your symlinks.yml matches your system
 
 3. Use verbose mode to see filtering details:
+
    ```bash
    sok symlinks list --verbose
    ```
